@@ -1,0 +1,65 @@
+name: "wedjat-check"
+description: "Measure an MCP server against the five WEDJAT conduct conditions, recompute the verdict hash, and fail the job by the policy you choose. Read only, free, no key."
+author: "The HORIZONs Co., Ltd."
+branding:
+  icon: "shield"
+  color: "green"
+
+inputs:
+  endpoint:
+    description: "https URL of the MCP endpoint to measure, for example https://your-server/mcp"
+    required: true
+  require:
+    description: "Policy that fails the job. verified: status must be verified. measured-pass: no measured condition may fail, unmeasured ones are allowed (default). none: report only."
+    required: false
+    default: "measured-pass"
+  must_pass:
+    description: "Comma separated condition keys that must be measured and pass, on top of the policy. Keys: mcp_endpoint, agent_card, compensation_disclosure, determinism, self_verification"
+    required: false
+    default: ""
+  allow_tool_call:
+    description: "true lets the gate execute one of your tools twice with empty arguments to measure determinism. Only for a server you own. Default false: nothing on your server is called."
+    required: false
+    default: "false"
+  gate:
+    description: "Gate origin. Leave the default unless you run your own instance of the gate."
+    required: false
+    default: "https://gate.horizonshield.dev"
+  timeout_ms:
+    description: "How long to wait for the gate before treating the run as unreachable (exit 3, not a verdict)."
+    required: false
+    default: "60000"
+
+outputs:
+  status:
+    description: "verified, pending, held, or whatever the gate returned"
+    value: ${{ steps.run.outputs.status }}
+  record_sha256:
+    description: "The verdict hash as issued by the gate"
+    value: ${{ steps.run.outputs.record_sha256 }}
+  recompute_match:
+    description: "true if the hash recomputed in this job equals record_sha256"
+    value: ${{ steps.run.outputs.recompute_match }}
+  failed_conditions:
+    description: "Comma separated keys of measured conditions that failed"
+    value: ${{ steps.run.outputs.failed_conditions }}
+  unmeasured_conditions:
+    description: "Comma separated keys of conditions the gate did not measure"
+    value: ${{ steps.run.outputs.unmeasured_conditions }}
+  record:
+    description: "The full verdict JSON, verbatim, for your own storage or recompute"
+    value: ${{ steps.run.outputs.record }}
+
+runs:
+  using: "composite"
+  steps:
+    - id: run
+      shell: bash
+      env:
+        WEDJAT_ENDPOINT: ${{ inputs.endpoint }}
+        WEDJAT_REQUIRE: ${{ inputs.require }}
+        WEDJAT_MUST_PASS: ${{ inputs.must_pass }}
+        WEDJAT_ALLOW_TOOL_CALL: ${{ inputs.allow_tool_call }}
+        WEDJAT_GATE: ${{ inputs.gate }}
+        WEDJAT_TIMEOUT_MS: ${{ inputs.timeout_ms }}
+      run: node "${{ github.action_path }}/check.mjs"

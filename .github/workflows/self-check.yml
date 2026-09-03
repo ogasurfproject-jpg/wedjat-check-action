@@ -1,0 +1,17 @@
+name: self check
+# The action measuring the gate that wrote it, on the gate's own schedule rule: once a day, in public.
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "23 4 * * *"
+  workflow_dispatch:
+jobs:
+  gate-on-itself:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          endpoint: https://gate.horizonshield.dev/mcp
+          require: measured-pass
