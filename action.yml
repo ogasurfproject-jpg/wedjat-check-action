@@ -1,5 +1,5 @@
 name: "wedjat-check"
-description: "Measure an MCP server against the five WEDJAT conduct conditions, recompute the verdict hash, and fail the job by the policy you choose. Read only, free, no key."
+description: "Measure an MCP server at the MCP Verification Gate, recompute the verdict hash, fail the job by your policy. Free, no key."
 author: "The HORIZONs Co., Ltd."
 branding:
   icon: "shield"
@@ -14,7 +14,7 @@ inputs:
     required: false
     default: "measured-pass"
   must_pass:
-    description: "Comma separated condition keys that must be measured and pass, on top of the policy. Keys: mcp_endpoint, agent_card, compensation_disclosure, determinism, self_verification"
+    description: "Comma separated condition keys that must be measured and pass, on top of the policy. Keys: mcp_endpoint, agent_card, compensation_disclosure, determinism"
     required: false
     default: ""
   allow_tool_call:

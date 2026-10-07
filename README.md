@@ -1,6 +1,12 @@
 # wedjat-check
 
-A GitHub Action that measures your MCP server against the five WEDJAT conduct conditions on every push, recomputes the verdict hash inside your own job, and fails the build by a policy you choose.
+```yaml
+- uses: ogasurfproject-jpg/wedjat-check-action@v1
+  with:
+    endpoint: https://your-server/mcp
+```
+
+Those three lines are the whole setup. The step measures your MCP server against the conduct conditions of the [MCP Verification Gate](https://gate.horizonshield.dev/spec), recomputes the verdict hash inside your own job, and fails the build by a policy you choose.
 
 Read only. Free. No account, no API key, nothing to sign up for. The gate calls no tool on your server unless you say so.
 
@@ -54,7 +60,7 @@ Independently of the policy, the job always fails if `record_sha256` does not re
           must_pass: agent_card,compensation_disclosure
 ```
 
-Condition keys: `mcp_endpoint`, `agent_card`, `compensation_disclosure`, `determinism`, `self_verification`.
+Condition keys: `mcp_endpoint`, `agent_card`, `compensation_disclosure`, `determinism`. The fifth condition, that the verdict hashes to its own `record_sha256`, is not a key: this action recomputes it on every run and fails the job on a mismatch whatever the policy.
 
 ## Determinism is off unless you turn it on
 
@@ -97,7 +103,7 @@ Exit 3 is deliberately separate so a network blip on the runner never reads as y
 
 ## What a passing run does not mean
 
-The same limits as the directory page. It does not mean any number your server returns is correct, that your disclosure is true, or that the business behind it is any good. It means five mechanical conditions were measured at that moment and came back the way the log says, and that anyone can recompute the record and get the same hash.
+The same limits as the directory page. It does not mean any number your server returns is correct, that your disclosure is true, or that the business behind it is any good. It means the mechanical conditions were measured at that moment and came back the way the log says, and that anyone can recompute the record and get the same hash.
 
 ## How the hash is recomputed
 
